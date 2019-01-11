@@ -22,6 +22,7 @@
     <ProjectReference Include="..\..\src\ChatterToolkitForNET\ChatterToolkitForNET.csproj" />
     <ProjectReference Include="..\..\src\CommonLibrariesForNET\CommonLibrariesForNET.csproj" />
     <ProjectReference Include="..\..\src\ForceToolkitForNET\ForceToolkitForNET.csproj" />
+    <ProjectReference Include="..\ForceToolkitForNET.TestsConfiguration\ForceToolkitForNET.TestsConfiguration.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="coverlet.msbuild" Version="2.2.1">

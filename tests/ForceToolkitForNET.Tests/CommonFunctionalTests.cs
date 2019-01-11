@@ -19,6 +19,7 @@ namespace Salesforce.Force.Tests
         private static string _consumerSecret = ConfigurationManager.AppSettings["ConsumerSecret"];
         private static string _username = ConfigurationManager.AppSettings["Username"];
         private static string _password = ConfigurationManager.AppSettings["Password"];
+        private static string _loginUrl = ConfigurationManager.AppSettings["LoginUrl"];
 
         private AuthenticationClient _auth;
         private JsonHttpClient _jsonHttpClient;
@@ -32,19 +33,33 @@ namespace Salesforce.Force.Tests
                 _consumerSecret = Environment.GetEnvironmentVariable("ConsumerSecret");
                 _username = Environment.GetEnvironmentVariable("Username");
                 _password = Environment.GetEnvironmentVariable("Password");
+                _loginUrl = Environment.GetEnvironmentVariable("LoginUrl");
+            }
+
+            if (string.IsNullOrEmpty(_consumerKey) && string.IsNullOrEmpty(_consumerSecret))
+            {
+                // Username may  have been filled by the Environment values above...
+                var configuration = TestsConfiguration.Helpers.Configuration.GetApplicationConfiguration(TestContext.CurrentContext.TestDirectory);
+
+                _consumerKey = configuration.ConsumerKey;
+                _consumerSecret = configuration.ConsumerSecret;
+                _username = configuration.Username;
+                _password = configuration.Password;
+                _loginUrl = configuration.LoginUrl;
             }
 
             // Use TLS 1.2 (instead of defaulting to 1.0)
-
-            const int SecurityProtocolTypeTls11 = 768;
-            const int SecurityProtocolTypeTls12 = 3072;
-
-            ServicePointManager.SecurityProtocol |= (SecurityProtocolType)(SecurityProtocolTypeTls12 | SecurityProtocolTypeTls11);
-
-            //ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+            ServicePointManager.SecurityProtocol |= (SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12);
 
             _auth = new AuthenticationClient();
-            _auth.UsernamePasswordAsync(_consumerKey, _consumerSecret, _username, _password).Wait();
+            if (string.IsNullOrEmpty(_loginUrl))
+            {
+                _auth.UsernamePasswordAsync(_consumerKey, _consumerSecret, _username, _password).Wait();
+            }
+            else
+            {
+                _auth.UsernamePasswordAsync(_consumerKey, _consumerSecret, _username, _password, _loginUrl).Wait();
+            }
 
             _jsonHttpClient = new JsonHttpClient(_auth.InstanceUrl, _auth.ApiVersion, _auth.AccessToken, new HttpClient());
         }
