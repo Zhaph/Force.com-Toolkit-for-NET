@@ -124,3 +124,14 @@ scripts/output.txt
 
 .vscode
 coverage.json
+
+# Visual Studio 2015/2017 cache/options directory
+.vs/
+
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Exclude local config/json files.
+*.[L|l]ocal.*
