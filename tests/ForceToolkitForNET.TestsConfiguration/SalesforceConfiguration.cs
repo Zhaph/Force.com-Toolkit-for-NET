@@ -7,5 +7,6 @@
         public string ConsumerKey { get; set; }
         public string ConsumerSecret { get; set; }
         public string LoginUrl { get; set; }
+        public bool TestUpsert { get; set; }
     }
 }

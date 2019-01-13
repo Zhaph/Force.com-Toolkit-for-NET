@@ -28,6 +28,7 @@ namespace Salesforce.Force.Tests
         public void Init()
         {
             bool.TryParse(ConfigurationManager.AppSettings["TestUpsert"], out _testUpsert);
+
             if (string.IsNullOrEmpty(_consumerKey) && string.IsNullOrEmpty(_consumerSecret) && string.IsNullOrEmpty(_username) && string.IsNullOrEmpty(_password))
             {
                 _consumerKey = Environment.GetEnvironmentVariable("ConsumerKey");
@@ -48,6 +49,7 @@ namespace Salesforce.Force.Tests
                 _username = configuration.Username;
                 _password = configuration.Password;
                 _loginUrl = configuration.LoginUrl;
+                _testUpsert = configuration.TestUpsert;
             }
 
             // Use TLS 1.2 (instead of defaulting to 1.0)
@@ -140,19 +142,23 @@ namespace Salesforce.Force.Tests
             var idBatch = new SObjectList<SObject>();
             idBatch.AddRange(results1[0].Items.Select(result => new SObject { { "Id", result.Id } }));
 
+            // create an Id list for the original dynamcially typed accounts created
+            var idDtBatch = new SObjectList<SObject>();
+            idDtBatch.AddRange(results2[0].Items.Select(result => new SObject { { "Id", result.Id } }));
+
             // delete all the strongly typed accounts
             var results4 = await _client.RunJobAndPollAsync("Account", BulkConstants.OperationType.Delete,
-                    new List<SObjectList<SObject>> { idBatch });
-
-
+                    new List<SObjectList<SObject>> { idBatch, idDtBatch });
 
             Assert.IsTrue(results4 != null, "[results4] empty result object");
-            Assert.AreEqual(results4.Count, 1, "[results4] wrong number of results");
+            Assert.AreEqual(results4.Count, 2, "[results4] wrong number of results");
             Assert.AreEqual(results4[0].Items.Count, 3, "[results4] wrong number of result records");
+            Assert.AreEqual(results4[1].Items.Count, 3, "[results4] wrong number of result records");
             Assert.IsFalse(results4[0].Items[0].Created);
             Assert.IsTrue(results4[0].Items[0].Success);
+            Assert.IsFalse(results4[1].Items[0].Created);
+            Assert.IsTrue(results4[1].Items[0].Success);
         }
-    }
 
         [Test]
         public async Task UpsertTests()
