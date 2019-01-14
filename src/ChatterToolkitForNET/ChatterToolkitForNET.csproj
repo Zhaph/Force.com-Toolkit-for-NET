@@ -60,7 +60,7 @@
   </ItemGroup>
   <Target Name="IncludeSalesforceCommon">
     <ItemGroup>
-      <BuildOutputInPackage Include="$(OutputPath)\Salesforce.Common.dll" />
+      <BuildOutputInPackage Include="$(OutputPath)Salesforce.Common.dll" />
     </ItemGroup>
   </Target>
 </Project>
