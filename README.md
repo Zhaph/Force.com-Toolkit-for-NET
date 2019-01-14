@@ -229,7 +229,7 @@ var accountsBatchList = new List<SObjectList<SObject>>
 };
 
 var results = await bulkClient.RunJobAndPollAsync("Account",
-						BulkConstants.OperationType.Insert, accountsBatchList);
+                       BulkConstants.OperationType.Insert, accountsBatchList);
 ```
 
 #### Update
@@ -257,7 +257,7 @@ var accountsBatchList = new List<SObjectList<SObject>>
 };
 
 var results = await bulkClient.RunJobAndPollAsync("Account",
-						BulkConstants.OperationType.Update, accountsBatchList);
+                       BulkConstants.OperationType.Update, accountsBatchList);
 ```
 
 #### Delete
@@ -283,7 +283,39 @@ var accountsBatchList = new List<SObjectList<SObject>>
 };
 
 var results = await bulkClient.RunJobAndPollAsync("Account",
-						BulkConstants.OperationType.Delete, accountsBatchList);
+                       BulkConstants.OperationType.Delete, accountsBatchList);
+```
+
+#### Upsert
+
+If your object includes a custom field with the External Id property set, you can use that to perform bulk upsert (update or insert) actions with `BulkConstants.OperationType.Upsert`. Note that you also have to specify the External Id field name when starting the job.
+
+```cs
+// Assumes you have a custom field "ExampleId" on your Account object
+// that has the "External Id" flag set.
+
+var accountsBatch1 = new SObjectList<SObject>
+{
+	new SObject
+	{
+		{"Name" = "TestDyAccount1"},
+		{"ExampleId" = "ID00001"}
+	},
+	new SObject
+	{
+		{"Name" = "TestDyAccount2"},
+		{"ExampleId" = "ID00002"}
+	}
+};
+
+var accountsBatchList = new List<SObjectList<SObject>>
+{
+	accountsBatch1
+};
+
+var results = await bulkClient.RunJobAndPollAsync("Account", "ExampleId"
+                       BulkConstants.OperationType.Upsert, accountsBatchList);
+
 ```
 
 ## Contributing to the Repository
